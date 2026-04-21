@@ -1,0 +1,31 @@
+name: Sync Keycloak to HF
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/keycloak/**' # Only runs if this folder was changed
+
+env:
+  HF_USERNAME: ${{ vars.HF_USERNAME }}
+  HF_SPACE_NAME: ${{ vars.HF_SPACE_NAME_KEYCLOAK }}
+  HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Push Folder to HF Space
+        run: |
+          cd docker/keycloak
+          
+          git init
+          git branch -M main
+          git add .
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit -m "Deploy Keycloak"
+          git push --force https://${{ env.HF_USERNAME }}:${{ env.HF_TOKEN }}@huggingface.co/spaces/${{ env.HF_USERNAME }}/${{ env.HF_SPACE_NAME }} main
