@@ -1,6 +1,6 @@
 FROM quay.io/keycloak/keycloak:26.2
 
-COPY docker/keycloak/realm-export.json /opt/keycloak/data/import/realm-export.json
+COPY ./realm-export.json /opt/keycloak/data/import/realm-export.json
 
 LABEL org.opencontainers.image.title="booklub-api-keycloak"
 LABEL org.opencontainers.image.description="Keycloak image for local development of booklub-api"

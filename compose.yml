@@ -15,10 +15,10 @@ services:
 
   keycloak:
     build:
-      context: .
+      context: ./docker/keycloak
       dockerfile: docker/keycloak/Dockerfile
     container_name: keycloak
-    command: ["start-dev", "--import-realm", "--features=scripts", "--spi-scripting-scripts-enabled=true"]
+    command: [ "start-dev", "--import-realm", "--features=scripts", "--spi-scripting-scripts-enabled=true" ]
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
