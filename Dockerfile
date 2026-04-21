@@ -16,8 +16,8 @@ ENV SERVER_PORT=8081
 
 WORKDIR /app
 
-COPY docker/prod/prepare_app.sh ./prepare_app.sh
-RUN chmod +x ./prepare_app.sh
+COPY scripts/docker/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 RUN addgroup --system spring && adduser --system --group spring
 USER spring:spring
@@ -30,4 +30,4 @@ LABEL org.opencontainers.image.title="booklub-api"
 LABEL org.opencontainers.image.description="Backend API for Booklub"
 LABEL org.opencontainers.image.environment="DB_URL, DB_USERNAME, DB_PASSWORD, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_AUTH_URL, S3_URL, S3_ACCESS_NAME, S3_ACCESS_SECRET"
 
-ENTRYPOINT ["./prepare_app.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
