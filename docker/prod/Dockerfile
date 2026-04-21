@@ -10,7 +10,7 @@ RUN mvn clean package -DskipTests
 
 
 ### Runtime stage ###
-FROM openjdk:17-slim AS runtime
+FROM eclipse-temurin:17-jre AS runtime
 
 ENV SERVER_PORT=8081
 
