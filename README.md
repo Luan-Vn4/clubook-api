@@ -1,3 +1,12 @@
+---
+title: Booklub API
+emoji: 📚
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # 📚 *Booklub-API*
 
 *Booklub* é uma plataforma social dedicada a conectar leitores em clubes de 
