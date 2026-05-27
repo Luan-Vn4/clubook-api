@@ -1,6 +1,6 @@
-package br.upe.booklubapi.app.user.dtos.mappers;
+package br.upe.booklubapi.app.notifications.dtos.mappers;
 
-import br.upe.booklubapi.app.user.dtos.NotificationDTO;
+import br.upe.booklubapi.app.notifications.dtos.NotificationDTO;
 import br.upe.booklubapi.domain.notification.entities.Notification;
 import org.springframework.stereotype.Component;
 

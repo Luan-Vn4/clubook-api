@@ -1,19 +1,7 @@
 package br.upe.booklubapi.domain.notification.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Type;
-import org.hibernate.proxy.HibernateProxy;
-import org.locationtech.jts.geom.Point;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.UUID;
 import br.upe.booklubapi.domain.users.entities.User;
 

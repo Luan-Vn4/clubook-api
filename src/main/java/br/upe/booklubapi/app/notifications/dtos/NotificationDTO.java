@@ -1,4 +1,4 @@
-package br.upe.booklubapi.app.user.dtos;
+package br.upe.booklubapi.app.notifications.dtos;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
