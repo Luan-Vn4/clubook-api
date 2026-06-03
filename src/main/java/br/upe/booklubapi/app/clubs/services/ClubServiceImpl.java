@@ -1,5 +1,6 @@
 package br.upe.booklubapi.app.clubs.services;
 
+import br.upe.booklubapi.app.notifications.services.NotificationService;
 import br.upe.booklubapi.app.clubs.dtos.*;
 import br.upe.booklubapi.app.user.dtos.mappers.UserDTOMapper;
 import br.upe.booklubapi.domain.clubs.entities.Club;
@@ -27,6 +28,8 @@ public class ClubServiceImpl implements ClubService {
 
     private final ClubRepository clubRepository;
 
+    private final NotificationService notificationService;
+
     private final ClubMediaStorageService clubMediaStorageService;
 
     private final QClub club = QClub.club;
@@ -46,6 +49,14 @@ public class ClubServiceImpl implements ClubService {
         created.setImageUrl(imagePath);
 
         clubRepository.save(club);
+
+        notificationService.sendNotification(
+                dto.ownerId(), // Pega o ID do dono que veio dentro do DTO
+                "Clube criado com sucesso! 🎉",
+                "Parabéns! O seu novo clube de leitura '" + created.getName() + "' foi criado e já está pronto para receber membros.",
+                "CLUB_CREATED"
+        );
+
 
         return clubDTOMapper.toDto(created);
     }

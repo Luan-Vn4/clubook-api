@@ -3,7 +3,7 @@ services:
     image: postgis/postgis:16-master
     container_name: booklub-postgres
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: booklub
     ports:
@@ -12,13 +12,20 @@ services:
       - ./docker-volumes/postgresql:/var/lib/postgresql/data
     networks:
       - booklub-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d booklub || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    
 
   keycloak:
     build:
       context: ./docker/keycloak
       dockerfile: Dockerfile
     container_name: keycloak
-    command: [ "start-dev", "--import-realm", "--features=scripts", "--spi-scripting-scripts-enabled=true" ]
+    command: [ "start-dev", "--import-realm", "--features=scripts", "--spi-scripting-scripts-enabled=true", "--health-enabled=true" ]
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
@@ -31,9 +38,16 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     networks:
       - booklub-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   minio:
     image: quay.io/minio/minio
@@ -47,6 +61,45 @@ services:
     volumes:
       - ./docker-volumes/minio:/data
     command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - booklub-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: booklub-api
+    environment:
+      - DB_URL=jdbc:postgresql://postgresql:5432/booklub
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_AUTH_URL=${KEYCLOAK_AUTH_URL}
+      - S3_URL=http://minio:9000
+      - S3_ACCESS_NAME=${S3_ACCESS_NAME}
+      - S3_ACCESS_SECRET=${S3_ACCESS_SECRET}
+      - S3_REGION=${S3_REGION}
+      - GOOGLE_BOOKS_API_BASE_URL=${GOOGLE_BOOKS_API_BASE_URL}
+      - GOOGLE_BOOKS_API_KEY=${GOOGLE_BOOKS_API_KEY}
+    ports:
+      - "${SERVER_PORT}:8081"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - booklub-network
 
 networks:
   booklub-network:
