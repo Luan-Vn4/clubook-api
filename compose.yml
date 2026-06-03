@@ -16,7 +16,7 @@ services:
   keycloak:
     build:
       context: ./docker/keycloak
-      dockerfile: docker/keycloak/Dockerfile
+      dockerfile: Dockerfile
     container_name: keycloak
     command: [ "start-dev", "--import-realm", "--features=scripts", "--spi-scripting-scripts-enabled=true" ]
     environment:

@@ -1,6 +1,6 @@
 package br.upe.booklubapi.app.user.dtos.mappers;
 
-import java.util.Map;
+import java.util.UUID;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -8,8 +8,8 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import br.upe.booklubapi.app.user.dtos.UpdateUserDTO;
 import br.upe.booklubapi.app.user.dtos.UserDTO;
 import br.upe.booklubapi.app.user.services.UserMediaStorageService;
 import br.upe.booklubapi.domain.users.entities.User;
@@ -23,7 +23,12 @@ import lombok.AllArgsConstructor;
 public interface UserDTOMapper {
     User toEntity(UserDTO userDTO);
 
-    @Mapping(source="user", target="imageUrl",  qualifiedByName="imageUrltoAttributes")
+    @Mapping(source="user", target="imageUrl", qualifiedByName="imageUrltoAttributes")
+    @Mapping(source="id", target="id", qualifiedByName="uuidToString")
+    @Mapping(source="username", target="username", qualifiedByName="nullToEmpty")
+    @Mapping(source="email", target="email", qualifiedByName="nullToEmpty")
+    @Mapping(source="firstName", target="firstName", qualifiedByName="nullToEmpty")
+    @Mapping(source="lastName", target="lastName", qualifiedByName="nullToEmpty")
     UserDTO toDTO(User user);
 }
 
@@ -34,9 +39,19 @@ class UserDTOMapperHelper {
 
     @Named("imageUrltoAttributes")
     public String handleImageUrlMapping(User user) {
-        if(user.getImage() == null) {
-            return null;
+        if (!StringUtils.hasText(user.getImage())) {
+            return "";
         }
         return userMediaStorageService.getProfilePictureUrl(user.getImage());
+    }
+
+    @Named("nullToEmpty")
+    public String nullToEmpty(String value) {
+        return value == null ? "" : value;
+    }
+
+    @Named("uuidToString")
+    public String uuidToString(UUID id) {
+        return id == null ? "" : id.toString();
     }
 }

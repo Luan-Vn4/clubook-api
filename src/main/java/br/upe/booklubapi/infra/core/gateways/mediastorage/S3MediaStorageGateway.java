@@ -7,6 +7,7 @@ import br.upe.booklubapi.utils.UnitUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -71,6 +72,9 @@ public class S3MediaStorageGateway implements MediaStorageGateway {
 
     @Override
     public boolean objectExists(String bucket, String object) {
+        if (!StringUtils.hasText(object)) {
+            return false;
+        }
         try {
             s3Client.headObject(builder -> builder
                 .bucket(bucket)
@@ -109,7 +113,9 @@ public class S3MediaStorageGateway implements MediaStorageGateway {
         int expirationTime,
         TimeUnit timeUnit
     ) {
-        if (!bucketExists(bucket) | !objectExists(bucket, object)) {
+        if (!StringUtils.hasText(object)
+            || !bucketExists(bucket)
+            || !objectExists(bucket, object)) {
             return Optional.empty();
         }
 

@@ -18,7 +18,8 @@ public record QueryClubDTO(
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public BooleanExpression getQuery(QClub club) {
         var containsName = this.name()
-            .map(club.name::contains)
+            .filter(name -> !name.isBlank())
+            .map(club.name::containsIgnoreCase)
             .orElse(Expressions.TRUE);
         
         var creationDateBetween = this.hasValidDateInterval()

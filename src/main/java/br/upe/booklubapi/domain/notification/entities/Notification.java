@@ -18,7 +18,11 @@ public class Notification {
     private String title;
     private String message;
     private String type;
+
+    @Column(name = "is_read")
     private boolean isRead;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     public Notification(UUID id, User recipient, String title, String message, String type, boolean isRead, LocalDateTime createdAt) {
