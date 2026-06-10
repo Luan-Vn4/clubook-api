@@ -6,5 +6,6 @@ public record UserDTO(
         String email,
         String firstName,
         String lastName,
-        String imageUrl) {
+        String imageUrl,
+        Integer totalClubs) {
 }

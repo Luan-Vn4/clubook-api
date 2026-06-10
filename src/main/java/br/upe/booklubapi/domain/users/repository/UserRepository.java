@@ -14,4 +14,6 @@ import br.upe.booklubapi.domain.users.entities.User;
 @Repository
 public interface UserRepository extends CrudRepository<User, UUID> {
     Optional<User> findByEmail(String email);
+
+    Integer countUserClubs(UUID userId);
 }

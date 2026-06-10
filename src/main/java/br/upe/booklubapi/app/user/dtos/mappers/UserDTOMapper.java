@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import br.upe.booklubapi.app.user.dtos.UserDTO;
 import br.upe.booklubapi.app.user.services.UserMediaStorageService;
 import br.upe.booklubapi.domain.users.entities.User;
+import br.upe.booklubapi.domain.users.repository.UserRepository;
 import lombok.AllArgsConstructor;
 
 @Mapper(
@@ -29,6 +30,7 @@ public interface UserDTOMapper {
     @Mapping(source="email", target="email", qualifiedByName="nullToEmpty")
     @Mapping(source="firstName", target="firstName", qualifiedByName="nullToEmpty")
     @Mapping(source="lastName", target="lastName", qualifiedByName="nullToEmpty")
+    @Mapping(target="totalClubs", expression="java(userDTOMapperHelper.getTotalClubs(user.getId()))")
     UserDTO toDTO(User user);
 }
 
@@ -36,6 +38,12 @@ public interface UserDTOMapper {
 @AllArgsConstructor
 class UserDTOMapperHelper {
     private final UserMediaStorageService userMediaStorageService;
+
+    private final UserRepository userRepository;
+
+    public Integer getTotalClubs(UUID userId) {
+        return userRepository.countUserClubs(userId);
+    }
 
     @Named("imageUrltoAttributes")
     public String handleImageUrlMapping(User user) {

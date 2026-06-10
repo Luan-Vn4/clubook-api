@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
@@ -28,6 +29,11 @@ import java.util.Objects;
 @Repository
 public interface JpaUserRepository
                 extends JpaRepository<User, UUID>, UserRepository, QuerydslPredicateExecutor<User> {
+
+    @Query("""
+        SELECT SIZE(u.clubs) FROM User u WHERE u.id = :userId
+    """)
+    Integer countUserClubs(UUID userId);
 
 }
 
