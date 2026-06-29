@@ -3,6 +3,7 @@ package br.upe.booklubapi.presentation.exceptions.readingoals;
 import br.upe.booklubapi.domain.readinggoals.exceptions.ConflictingReadingGoalException;
 import br.upe.booklubapi.domain.readinggoals.exceptions.IllegalReadingGoalDate;
 import br.upe.booklubapi.domain.readinggoals.exceptions.NoCurrentReadingGoalException;
+import br.upe.booklubapi.domain.readinggoals.exceptions.ReadingGoalNotFinishedException;
 import br.upe.booklubapi.domain.readinggoals.exceptions.ReadingGoalNotFoundException;
 import br.upe.booklubapi.presentation.exceptions.core.ExceptionBody;
 import org.springframework.http.HttpStatus;
@@ -50,6 +51,20 @@ public class ReadingGoalExceptionHandler {
         final var resp = ExceptionBody.builder()
             .httpStatus(status.value())
             .error("No Current Reading Goal Defined")
+            .message(e.getMessage())
+            .timestamp(Instant.now())
+            .build();
+
+        return ResponseEntity.status(status).body(resp);
+    }
+
+    @ExceptionHandler(ReadingGoalNotFinishedException.class)
+    public ResponseEntity<ExceptionBody> handle(ReadingGoalNotFinishedException e) {
+        final HttpStatus status = HttpStatus.FORBIDDEN;
+
+        final var resp = ExceptionBody.builder()
+            .httpStatus(status.value())
+            .error("Reading period not finished")
             .message(e.getMessage())
             .timestamp(Instant.now())
             .build();

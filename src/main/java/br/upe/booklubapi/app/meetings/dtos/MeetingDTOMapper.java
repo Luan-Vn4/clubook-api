@@ -12,7 +12,6 @@ import org.mapstruct.*;
 public interface MeetingDTOMapper {
 
     @Mapping(source="readingGoal.id", target="readingGoalId")
-    @Mapping(source="readingGoal.endDate", target="date")
     @Mapping(source="readingGoal.club.id", target="clubId")
     MeetingDTO toDto(Meeting meeting);
 

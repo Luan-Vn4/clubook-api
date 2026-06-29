@@ -82,6 +82,14 @@ public class User {
         attributes.put("imageUrl", image);
     }
 
+    public String getBirthDate() {
+        return attributes.getOrDefault("birthDate", "");
+    }
+
+    public void setBirthDate(String birthDate) {
+        attributes.put("birthDate", birthDate);
+    }
+
     public boolean joinClub(Club club) {
         clubs.add(club);
         if (club.containsMember(this)) return true;

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -17,5 +18,7 @@ public record CreateMeetingDTO(
     @NotEmpty
     String address,
     @NotNull
-    SimpleCoordinate latlng
+    SimpleCoordinate latlng,
+    @NotNull
+    LocalDateTime date
 ) implements Serializable {}

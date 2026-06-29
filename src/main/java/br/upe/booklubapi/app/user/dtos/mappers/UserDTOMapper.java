@@ -30,6 +30,7 @@ public interface UserDTOMapper {
     @Mapping(source="email", target="email", qualifiedByName="nullToEmpty")
     @Mapping(source="firstName", target="firstName", qualifiedByName="nullToEmpty")
     @Mapping(source="lastName", target="lastName", qualifiedByName="nullToEmpty")
+    @Mapping(source="birthDate", target="birthDate", qualifiedByName="nullToEmpty")
     @Mapping(target="totalClubs", expression="java(userDTOMapperHelper.getTotalClubs(user.getId()))")
     UserDTO toDTO(User user);
 }

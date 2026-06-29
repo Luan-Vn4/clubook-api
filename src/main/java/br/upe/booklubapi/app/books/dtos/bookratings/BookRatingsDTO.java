@@ -14,7 +14,11 @@ public record BookRatingsDTO(
     @NotNull
     String bookId,
     @NotNull
-    @Min(1)
+    @Min(0)
+    @Max(5)
+    Integer rating,
+    @NotNull
+    @Min(0)
     @Max(5)
     Integer difficulty,
     @Nullable

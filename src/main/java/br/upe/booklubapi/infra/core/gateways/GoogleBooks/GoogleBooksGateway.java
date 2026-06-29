@@ -34,21 +34,30 @@ public class GoogleBooksGateway {
 
 
     public Page<BookVolume> searchBooks(String query, Pageable pageable) {
-        log.info("Searching books on Google Books API with query: {}", query);
+        return searchBooks(query, pageable, null);
+    }
+
+    public Page<BookVolume> searchBooks(String query, Pageable pageable, String orderBy) {
+        log.info("Searching books on Google Books API with query: {} (orderBy: {})", query, orderBy);
 
         int index = pageable.getPageNumber() * pageable.getPageSize();
 
         BookSearchResponse response =
                 webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/volumes")
-                        .queryParam("q", query)
-                        .queryParam("printType", "books")
-                        .queryParam("startIndex", index)
-                        .queryParam("maxResults", pageable.getPageSize())
-                        .queryParam("key", apiKey)
-                        .build()
-                )
+                .uri(uriBuilder -> {
+                        uriBuilder
+                            .path("/volumes")
+                            .queryParam("q", query)
+                            .queryParam("printType", "books")
+                            .queryParam("startIndex", index)
+                            .queryParam("maxResults", pageable.getPageSize());
+                        if (orderBy != null && !orderBy.isBlank()) {
+                            uriBuilder.queryParam("orderBy", orderBy);
+                        }
+                        return uriBuilder
+                            .queryParam("key", apiKey)
+                            .build();
+                })
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(BookSearchResponse.class)

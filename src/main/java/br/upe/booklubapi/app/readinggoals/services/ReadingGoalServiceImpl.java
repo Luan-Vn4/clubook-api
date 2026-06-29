@@ -1,8 +1,13 @@
 package br.upe.booklubapi.app.readinggoals.services;
 
+import br.upe.booklubapi.app.books.dtos.BookUserDTO;
+import br.upe.booklubapi.app.books.dtos.bookratings.CreateBookRatingsDTO;
+import br.upe.booklubapi.app.books.services.BookRatingsService;
+import br.upe.booklubapi.app.books.services.BookUserService;
 import br.upe.booklubapi.app.readinggoals.dtos.*;
 import br.upe.booklubapi.domain.activities.entities.clubactivities.ReadingGoalDefinedActivity;
 import br.upe.booklubapi.domain.activities.repositories.ActivityRepository;
+import br.upe.booklubapi.domain.books.entities.BookUserId;
 import br.upe.booklubapi.domain.clubs.entities.Club;
 import br.upe.booklubapi.domain.clubs.exceptions.ClubNotFoundException;
 import br.upe.booklubapi.domain.clubs.exceptions.UnauthorizedClubActionException;
@@ -12,6 +17,7 @@ import br.upe.booklubapi.domain.readinggoals.entities.ReadingGoal;
 import br.upe.booklubapi.domain.readinggoals.exceptions.ConflictingReadingGoalException;
 import br.upe.booklubapi.domain.readinggoals.exceptions.IllegalReadingGoalDate;
 import br.upe.booklubapi.domain.readinggoals.exceptions.NoCurrentReadingGoalException;
+import br.upe.booklubapi.domain.readinggoals.exceptions.ReadingGoalNotFinishedException;
 import br.upe.booklubapi.domain.readinggoals.exceptions.ReadingGoalNotFoundException;
 import br.upe.booklubapi.domain.readinggoals.repositories.ReadingGoalRepository;
 import br.upe.booklubapi.domain.users.entities.User;
@@ -48,6 +54,10 @@ public class ReadingGoalServiceImpl implements ReadingGoalService {
     private final UserRepository userRepository;
 
     private final ActivityRepository activityRepository;
+
+    private final BookUserService bookUserService;
+
+    private final BookRatingsService bookRatingsService;
 
     private User getUser(UUID id) {
         return userRepository.findById(id).orElseThrow(
@@ -185,7 +195,8 @@ public class ReadingGoalServiceImpl implements ReadingGoalService {
         User loggedUser = getUser(userUtils.getLoggedUserId());
         Club club = getClub(clubId);
 
-        if (!loggedUser.isInClub(club)) {
+        // Only private clubs restrict reading goals to members.
+        if (Boolean.TRUE.equals(club.getIsPrivate()) && !loggedUser.isInClub(club)) {
             throw new UnauthorizedClubActionException(
                 "Get Reading Goals",
                 loggedUser.getId(),
@@ -226,12 +237,90 @@ public class ReadingGoalServiceImpl implements ReadingGoalService {
     }
 
     @Override
+    @Transactional
+    public ReadingGoalDTO finishReadingGoal(
+        UUID readingGoalId,
+        ReviewReadingGoalDTO dto
+    ) {
+        final UUID loggedUserId = userUtils.getLoggedUserId();
+        final ReadingGoal readingGoal = getReadingGoalById(readingGoalId);
+        final Club club = readingGoal.getClub();
+
+        // Only the club owner can finish a reading goal.
+        if (!club.getOwner().getId().equals(loggedUserId)) {
+            throw new UnauthorizedClubActionException(
+                "Finish Reading Goal",
+                loggedUserId,
+                club.getId()
+            );
+        }
+
+        readingGoal.setFinished(true);
+        final ReadingGoal saved = readingGoalRepository.save(readingGoal);
+
+        saveBookReview(loggedUserId, readingGoal.getBookId(), dto);
+
+        return readingGoalDTOMapper.toDto(saved);
+    }
+
+    @Override
+    @Transactional
+    public void reviewReadingGoal(
+        UUID readingGoalId,
+        ReviewReadingGoalDTO dto
+    ) {
+        final UUID loggedUserId = userUtils.getLoggedUserId();
+        final User loggedUser = getUser(loggedUserId);
+        final ReadingGoal readingGoal = getReadingGoalById(readingGoalId);
+        final Club club = readingGoal.getClub();
+
+        if (!loggedUser.isInClub(club)) {
+            throw new UnauthorizedClubActionException(
+                "Review Reading Goal",
+                loggedUserId,
+                club.getId()
+            );
+        }
+
+        // Members can only review once the reading period has ended.
+        if (!LocalDate.now().isAfter(readingGoal.getEndDate())) {
+            throw new ReadingGoalNotFinishedException(readingGoalId);
+        }
+
+        saveBookReview(loggedUserId, readingGoal.getBookId(), dto);
+    }
+
+    private void saveBookReview(
+        UUID userId,
+        String bookId,
+        ReviewReadingGoalDTO dto
+    ) {
+        // book_ratings has a FK to book_user, so make sure that row exists
+        // (and mark the book as read) before saving the rating.
+        ensureBookInUserLibrary(userId, bookId);
+
+        bookRatingsService.save(
+            new BookUserId(bookId, userId),
+            new CreateBookRatingsDTO(dto.rating(), (short) 0, dto.review())
+        );
+    }
+
+    private void ensureBookInUserLibrary(UUID userId, String bookId) {
+        try {
+            bookUserService.findById(userId, bookId);
+        } catch (RuntimeException e) {
+            bookUserService.save(new BookUserDTO(userId, bookId, 1.0));
+        }
+    }
+
+    @Override
     public ReadingGoalDTO getReadingGoal(UUID readingGoalId) {
         User loggedUser = getUser(userUtils.getLoggedUserId());
         ReadingGoal readingGoal = getReadingGoalById(readingGoalId);
         Club club = readingGoal.getClub();
 
-        if (!loggedUser.isInClub(club)) {
+        // Only private clubs restrict reading goals to members.
+        if (Boolean.TRUE.equals(club.getIsPrivate()) && !loggedUser.isInClub(club)) {
             throw new UnauthorizedClubActionException(
                 "Get Reading Goals",
                 loggedUser.getId(),

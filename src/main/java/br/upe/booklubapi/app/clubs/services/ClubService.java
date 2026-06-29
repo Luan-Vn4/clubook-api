@@ -1,5 +1,6 @@
 package br.upe.booklubapi.app.clubs.services;
 
+import br.upe.booklubapi.app.books.dtos.BookClubStatsDTO;
 import br.upe.booklubapi.app.clubs.dtos.ClubDTO;
 import br.upe.booklubapi.app.clubs.dtos.CreateClubDTO;
 import br.upe.booklubapi.app.clubs.dtos.QueryClubDTO;
@@ -9,6 +10,8 @@ import org.springframework.data.web.PagedModel;
 import java.util.UUID;
 
 public interface ClubService {
+
+    BookClubStatsDTO getBookClubStats(String bookId);
 
     ClubDTO create(CreateClubDTO dto);
 

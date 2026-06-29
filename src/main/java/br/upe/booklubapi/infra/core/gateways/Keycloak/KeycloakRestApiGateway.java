@@ -83,7 +83,14 @@ public class KeycloakRestApiGateway {
                 userMap.put("enabled", true);
 
                 Map<String, Object> attributes = new HashMap<>();
-                attributes.put("imageUrl", List.of(updatedUser.getAttributes().get("imageUrl")));
+                String imageUrl = updatedUser.getAttributes().get("imageUrl");
+                if (imageUrl != null) {
+                        attributes.put("imageUrl", List.of(imageUrl));
+                }
+                String birthDate = updatedUser.getAttributes().get("birthDate");
+                if (birthDate != null) {
+                        attributes.put("birthDate", List.of(birthDate));
+                }
 
                 userMap.put("attributes", attributes);
 
@@ -159,6 +166,9 @@ public class KeycloakRestApiGateway {
 
                 Map<String, Object> attributes = new HashMap<>();
                 attributes.put("imageUrl", List.of(newProfilePicturePath));
+                if (userBeingUpdated.birthDate() != null) {
+                        attributes.put("birthDate", List.of(userBeingUpdated.birthDate()));
+                }
                 userMap.put("attributes", attributes);
 
                 String userJson = "";
@@ -192,6 +202,9 @@ public class KeycloakRestApiGateway {
 
                 Map<String, Object> attributes = new HashMap<>();
                 attributes.put("imageUrl", List.of("null"));//gambiarra pra parar um bug de update user no dia da apresentçaop de elisson
+                if (userDTO.birthDate() != null) {
+                        attributes.put("birthDate", List.of(userDTO.birthDate()));
+                }
                 userMap.put("attributes", attributes);
 
                 List<Map<String, Object>> credentials = new ArrayList<>();

@@ -41,6 +41,19 @@ public interface JpaClubRepository
     """)
     Integer countClubMembers(UUID clubId);
 
+    @Query("""
+        SELECT COUNT(DISTINCT rg.club) FROM ReadingGoal rg
+            WHERE rg.bookId = :bookId AND rg.endDate < :today
+    """)
+    Integer countClubsThatFinishedBook(String bookId, java.time.LocalDate today);
+
+    @Query("""
+        SELECT COUNT(DISTINCT rg.club) FROM ReadingGoal rg
+            WHERE rg.bookId = :bookId
+                AND :today BETWEEN rg.startDate AND rg.endDate
+    """)
+    Integer countClubsCurrentlyReadingBook(String bookId, java.time.LocalDate today);
+
 }
 
 @Component

@@ -46,6 +46,10 @@ public class Meeting {
     @Type(GeometryType.class)
     private Point latlng;
 
+    @Column(name="meeting_date")
+    @NotNull
+    private LocalDateTime date;
+
     @CreationTimestamp
     @Column(name="created_at", updatable=false)
     private LocalDateTime createdAt;

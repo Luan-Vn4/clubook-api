@@ -38,6 +38,22 @@ public class GoogleBooksServiceImpl implements GoogleBooksService {
     }
 
     @Override
+    public PagedModel<BookItem> getTrendingBooks(Pageable pageable) {
+        // Google Books has no "trending" concept, so we approximate it with the
+        // newest releases of a popular subject (orderBy=newest).
+        BookItemQuery query = BookItemQuery.builder().subject("fiction").build();
+
+        Page<BookVolume> response = googleGateway.searchBooks(
+            query.toString(),
+            pageable,
+            "newest"
+        );
+
+        Page<BookItem> pageBookItem = response.map(this::convertToBookItem);
+        return new PagedModel<>(pageBookItem);
+    }
+
+    @Override
     public BookItem getBookById(String id) {
         BookVolume volume = googleGateway.getBookById(id);
         return convertToBookItem(volume);

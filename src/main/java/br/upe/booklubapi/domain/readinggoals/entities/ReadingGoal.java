@@ -53,6 +53,10 @@ public class ReadingGoal {
     @NotNull
     private LocalDate endDate;
 
+    @Column(name="finished")
+    @NotNull
+    private Boolean finished = false;
+
     @OneToOne(mappedBy="readingGoal")
     @Nullable
     @Cascade(org.hibernate.annotations.CascadeType.ALL)

@@ -6,6 +6,7 @@ import br.upe.booklubapi.app.user.dtos.mappers.UserDTOMapper;
 import br.upe.booklubapi.domain.clubs.entities.Club;
 import br.upe.booklubapi.domain.clubs.entities.QClub;
 import br.upe.booklubapi.domain.clubs.exceptions.ClubNotFoundException;
+import br.upe.booklubapi.app.books.dtos.BookClubStatsDTO;
 import br.upe.booklubapi.domain.clubs.repositories.ClubRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,21 @@ public class ClubServiceImpl implements ClubService {
     private final ClubMediaStorageService clubMediaStorageService;
 
     private final QClub club = QClub.club;
+
+    @Override
+    public BookClubStatsDTO getBookClubStats(String bookId) {
+        final java.time.LocalDate today = java.time.LocalDate.now();
+
+        final int alreadyRead = java.util.Optional.ofNullable(
+            clubRepository.countClubsThatFinishedBook(bookId, today)
+        ).orElse(0);
+
+        final int currentlyReading = java.util.Optional.ofNullable(
+            clubRepository.countClubsCurrentlyReadingBook(bookId, today)
+        ).orElse(0);
+
+        return new BookClubStatsDTO(alreadyRead, currentlyReading);
+    }
 
     @Override
     @Transactional

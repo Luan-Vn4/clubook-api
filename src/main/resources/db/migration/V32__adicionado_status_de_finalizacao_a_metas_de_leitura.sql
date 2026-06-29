@@ -1,0 +1,2 @@
+ALTER TABLE reading_goals
+    ADD finished BOOLEAN NOT NULL DEFAULT FALSE;

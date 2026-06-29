@@ -21,5 +21,7 @@ public record UpdateUserDTO(
     @Nullable
     String lastName,
     @Nullable
+    String birthDate,
+    @Nullable
     MultipartFile image
 ) {}

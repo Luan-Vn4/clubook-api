@@ -21,5 +21,7 @@ public record ReadingGoalDTO(
     @NotNull
     LocalDate endDate,
     @NotNull
+    Boolean finished,
+    @NotNull
     LocalDateTime createdAt
 ) implements Serializable {}

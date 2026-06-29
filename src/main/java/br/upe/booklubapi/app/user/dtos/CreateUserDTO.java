@@ -17,10 +17,13 @@ public record CreateUserDTO(
     
     @NotNull
     String lastName,
-    
+
+    @Nullable
+    String birthDate,
+
     @Nullable
     MultipartFile image,
-    
+
     @NotNull
     String password
 ) {}

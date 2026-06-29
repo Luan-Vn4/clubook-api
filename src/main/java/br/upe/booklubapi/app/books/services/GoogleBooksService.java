@@ -10,6 +10,7 @@ import java.util.List;
 public interface GoogleBooksService {
 
     PagedModel<BookItem> searchBooks(BookItemQuery query, Pageable pageable);
+    PagedModel<BookItem> getTrendingBooks(Pageable pageable);
     BookItem getBookById(String id);
 
 }
