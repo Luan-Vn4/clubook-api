@@ -25,7 +25,7 @@ services:
       context: ./docker/keycloak
       dockerfile: Dockerfile
     container_name: keycloak
-    command: [ "start-dev", "--import-realm", "--features=scripts", "--spi-scripting-scripts-enabled=true", "--health-enabled=true" ]
+    # Comando agora está no Dockerfile CMD
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
