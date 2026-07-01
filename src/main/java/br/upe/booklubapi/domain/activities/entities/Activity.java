@@ -1,5 +1,6 @@
 package br.upe.booklubapi.domain.activities.entities;
 
+import br.upe.booklubapi.domain.activities.entities.enums.ActivityType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,10 @@ public abstract class Activity {
     @Id
     @GeneratedValue(strategy=GenerationType.UUID)
     private UUID id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "activity_type", nullable = false)
+    private ActivityType activityType;
 
     @CreationTimestamp
     @Column(name="created_at", updatable=false)

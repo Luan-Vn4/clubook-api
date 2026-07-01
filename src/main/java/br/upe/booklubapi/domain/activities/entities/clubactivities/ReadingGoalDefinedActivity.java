@@ -1,5 +1,6 @@
 package br.upe.booklubapi.domain.activities.entities.clubactivities;
 
+import br.upe.booklubapi.domain.activities.entities.enums.ActivityType;
 import br.upe.booklubapi.domain.readinggoals.entities.ReadingGoal;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,5 +24,10 @@ public class ReadingGoalDefinedActivity extends ClubActivity {
     @JoinColumn(name="reading_goal_id")
     @OnDelete(action=OnDeleteAction.CASCADE)
     private ReadingGoal readingGoal;
+
+    @PrePersist
+    private void prePersist() {
+        setActivityType(ActivityType.READING_GOAL_DEFINED);
+    }
 
 }

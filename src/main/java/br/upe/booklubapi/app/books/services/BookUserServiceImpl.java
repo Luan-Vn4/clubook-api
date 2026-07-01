@@ -12,6 +12,8 @@ import br.upe.booklubapi.domain.books.exceptions.BookUserNotFoundException;
 import br.upe.booklubapi.domain.books.repositories.BookProgressRepository;
 import br.upe.booklubapi.domain.clubs.entities.Club;
 import br.upe.booklubapi.domain.clubs.repositories.ClubRepository;
+import br.upe.booklubapi.domain.readinggoals.entities.ReadingGoal;
+import br.upe.booklubapi.domain.readinggoals.repositories.ReadingGoalRepository;
 import br.upe.booklubapi.domain.users.entities.User;
 import br.upe.booklubapi.domain.users.exceptions.UserNotFoundException;
 import br.upe.booklubapi.domain.users.repository.UserRepository;
@@ -36,6 +38,8 @@ public class BookUserServiceImpl implements BookUserService {
     private final ActivityRepository activityRepository;
 
     private final ClubRepository clubRepository;
+
+    private final ReadingGoalRepository readingGoalRepository;
 
     private final UserRepository userRepository;
 
@@ -62,20 +66,27 @@ public class BookUserServiceImpl implements BookUserService {
 
     private void publishCompletedReadingActivities(BookUser bookUser) {
         final User user = getUser(bookUser.getId().getUserId());
+        final String bookId = bookUser.getId().getBookId();
 
         final List<Club> clubsReadingBook = clubRepository
             .findAllClubsByReadingGoalBookId(
-                bookUser.getId().getBookId(),
+                bookId,
                 Pageable.unpaged()
             )
             .filter(user::isInClub)
             .toList();
 
         for (Club club : clubsReadingBook) {
+            final ReadingGoal goal = readingGoalRepository
+                .findByClub_IdAndBookId(club.getId(), bookId)
+                .orElse(null);
+
             final var memberFinishedReadingActivity = MemberCompletedReadingActivity
                 .builder()
                 .bookUser(bookUser)
                 .club(club)
+                .startDate(goal != null ? goal.getStartDate() : null)
+                .endDate(goal != null ? goal.getEndDate() : null)
                 .build();
 
             activityRepository.save(memberFinishedReadingActivity);

@@ -4,6 +4,7 @@ import br.upe.booklubapi.app.activities.clubactivities.dtos.MeetingDefinedActivi
 import br.upe.booklubapi.app.activities.clubactivities.dtos.MemberCompletedReadingActivityDTO;
 import br.upe.booklubapi.app.activities.clubactivities.dtos.ReadingGoalDefinedActivityDTO;
 import br.upe.booklubapi.app.activities.useractivities.dtos.UserCompletedReadingActivityDTO;
+import br.upe.booklubapi.domain.activities.entities.enums.ActivityType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,6 @@ public interface ActivityDTO {
 
     LocalDateTime createdAt();
 
-    String type();
+    ActivityType type();
 
 }

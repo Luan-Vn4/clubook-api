@@ -1,5 +1,6 @@
 package br.upe.booklubapi.domain.activities.entities.clubactivities;
 
+import br.upe.booklubapi.domain.activities.entities.enums.ActivityType;
 import br.upe.booklubapi.domain.meetings.entities.Meeting;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,5 +24,10 @@ public class MeetingDefinedActivity extends ClubActivity {
     @JoinColumn(name="meeting_id")
     @OnDelete(action= OnDeleteAction.CASCADE)
     private Meeting meeting;
+
+    @PrePersist
+    private void prePersist() {
+        setActivityType(ActivityType.MEETING_DEFINED);
+    }
 
 }
