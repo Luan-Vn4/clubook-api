@@ -13,4 +13,6 @@ public interface ReadingGoalRepository
 
     Optional<ReadingGoal> findClubCurrentReadingGoal(UUID clubId);
 
+    Optional<ReadingGoal> findByClub_IdAndBookId(UUID clubId, String bookId);
+
 }
